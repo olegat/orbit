@@ -1,0 +1,38 @@
+diff --git a/OrbitQt/main.cpp b/OrbitQt/main.cpp
+index eb1f4239..beefd839 100644
+--- a/OrbitQt/main.cpp
++++ b/OrbitQt/main.cpp
+@@ -14,6 +14,9 @@
+ #include <QProcessEnvironment>
+ #include <QProgressDialog>
+ #include <QStyleFactory>
++#if 1  // TODO(olegat): debug code; remove me
++#include <QTranslator>
++#endif
+ #include <optional>
+ 
+ #ifdef _WIN32
+@@ -315,6 +318,23 @@ int main(int argc, char* argv[]) {
+ 
+     QApplication app(argc, argv);
+     QApplication::setApplicationName("orbitprofiler");
++#if 1  // TODO(olegat): debug code; remove me
++    //
++    QLocale::setDefault(QLocale{"fr_FR"});
++    QTranslator& trans = *new QTranslator();
++    QString path = QApplication::applicationDirPath();
++    path.append("/test_fr.qm");
++    std::string viewable = path.toStdString();
++    bool ok = trans.load(path);
++    if (ok) {
++      ok = app.installTranslator(&trans);
++      if (!ok) {
++        LOG("Still not ok.");
++      }
++    } else {
++      LOG("Not ok");
++    }
++#endif
+ 
+     if (DevModeEnabledViaEnvironmentVariable()) {
+       absl::SetFlag(&FLAGS_devmode, true);
