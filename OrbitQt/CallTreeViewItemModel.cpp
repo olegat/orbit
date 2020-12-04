@@ -17,10 +17,11 @@ QVariant CallTreeViewItemModel::GetDisplayRoleData(const QModelIndex& index) con
     switch (index.column()) {
       case kThreadOrFunction:
         if (thread_item->thread_id() == SamplingProfiler::kAllThreadsFakeTid) {
+          std::string localized{tr("(all threads)").toStdString()};
           return QString::fromStdString(
               thread_item->thread_name().empty()
-                  ? "(all threads)"
-                  : absl::StrFormat("%s (all threads)", thread_item->thread_name()));
+                  ? localized
+                  : absl::StrFormat("%s %s", thread_item->thread_name(), localized));
         } else {
           return QString::fromStdString(thread_item->thread_name().empty()
                                             ? std::to_string(thread_item->thread_id())
@@ -159,17 +160,17 @@ QVariant CallTreeViewItemModel::headerData(int section, Qt::Orientation orientat
     case Qt::DisplayRole: {
       switch (section) {
         case Columns::kThreadOrFunction:
-          return "Thread / Function";
+          return tr("Thread / Function");
         case Columns::kInclusive:
-          return "Inclusive";
+          return tr("Inclusive");
         case Columns::kExclusive:
-          return "Exclusive";
+          return tr("Exclusive");
         case Columns::kOfParent:
-          return "Of parent";
+          return tr("Of parent");
         case Columns::kModule:
-          return "Module";
+          return tr("Module");
         case Columns::kFunctionAddress:
-          return "Function address";
+          return tr("Function address");
       }
     } break;
     case Qt::InitialSortOrderRole: {

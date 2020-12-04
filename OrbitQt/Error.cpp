@@ -6,29 +6,42 @@
 
 #include <absl/strings/str_format.h>
 
+#include <QCoreApplication>
+#include <QString>
+
 namespace OrbitQt {
 
-std::string ErrorCategory::message(int condition) const {
+static QString localized_message(int condition) {
   switch (static_cast<Error>(condition)) {
     case Error::kCouldNotConnectToServer:
-      return "Could not connect to remote server.";
+      return QCoreApplication::translate("ErrorCategory", "Could not connect to remote server.");
     case Error::kCouldNotUploadPackage:
-      return "Could not upload OrbitService package to remote. Please make "
-             "sure the .deb package is located in the `collector` folder.";
+      return QCoreApplication::translate(
+          "ErrorCategory",
+          "Could not upload OrbitService package to remote. Please make "
+          "sure the .deb package is located in the `collector` folder.");
     case Error::kCouldNotUploadSignature:
-      return "Could not upload OrbitService signature to remote. Please make "
-             "sure the .deb.asc signature is located in the `collector` "
-             "folder.";
+      return QCoreApplication::translate(
+          "ErrorCategory",
+          "Could not upload OrbitService signature to remote. Please make "
+          "sure the .deb.asc signature is located in the `collector` "
+          "folder.");
     case Error::kCouldNotInstallPackage:
-      return "Could not install OrbitService on remote.";
+      return QCoreApplication::translate("ErrorCategory",
+                                         "Could not install OrbitService on remote.");
     case Error::kCouldNotStartTunnel:
-      return "Could not start tunnel to remote.";
+      return QCoreApplication::translate("ErrorCategory", "Could not start tunnel to remote.");
     case Error::kUserCanceledServiceDeployment:
-      return "User canceled the deployment.";
+      return QCoreApplication::translate("ErrorCategory", "User canceled the deployment.");
     case Error::kUserClosedStartUpWindow:
-      return "User closed window.";
+      return QCoreApplication::translate("ErrorCategory", "User closed window.");
   }
 
-  return absl::StrFormat("Unknown error condition: %i.", condition);
+  return QCoreApplication::translate("ErrorCategory", "Unknown error condition: %i.")
+      .arg(condition);
+}
+
+std::string ErrorCategory::message(int condition) const {
+  return localized_message(condition).toStdString();
 }
 }  // namespace OrbitQt

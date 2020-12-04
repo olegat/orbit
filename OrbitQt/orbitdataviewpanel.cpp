@@ -6,6 +6,8 @@
 
 #include <string>
 
+#include <QCoreApplication>
+
 #include "ui_orbitdataviewpanel.h"
 
 OrbitDataViewPanel::OrbitDataViewPanel(QWidget* parent)
@@ -29,7 +31,7 @@ void OrbitDataViewPanel::Initialize(DataView* data_view, SelectionType selection
 
   std::string label = ui->treeView->GetLabel();
   if (!label.empty()) {
-    this->ui->label->setText(QString::fromStdString(label));
+    this->ui->label->setText(QCoreApplication::translate("OrbitTableView", label.c_str()));
     this->ui->label->show();
   }
 

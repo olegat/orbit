@@ -35,7 +35,7 @@ QVariant ProcessItemModel::data(const QModelIndex& idx, int role) const {
       case Column::kName:
         return QString::fromStdString(process.name());
       case Column::kCpu:
-        return QString("%1 %").arg(process.cpu_usage(), 0, 'f', 1);
+        return tr("%1 %").arg(process.cpu_usage(), 0, 'f', 1);
       case Column::kEnd:
         UNREACHABLE();
     }
@@ -86,11 +86,11 @@ QVariant ProcessItemModel::headerData(int section, Qt::Orientation orientation, 
   if (role == Qt::DisplayRole) {
     switch (static_cast<Column>(section)) {
       case Column::kPid:
-        return "PID";
+        return tr("PID");
       case Column::kName:
-        return "Name";
+        return tr("Name");
       case Column::kCpu:
-        return "CPU %";
+        return tr("CPU %");
       case Column::kEnd:
         UNREACHABLE();
     }

@@ -4,6 +4,8 @@
 
 #include "OrbitGgp/InstanceItemModel.h"
 
+#include <QCoreApplication>
+
 namespace {
 enum class Columns { DisplayName, ID, IPAddress, LastUpdated, Owner, Pool, NumberOfColumns };
 }  // namespace
@@ -69,17 +71,17 @@ QVariant InstanceItemModel::headerData(int section, Qt::Orientation orientation,
 
   switch (static_cast<Columns>(section)) {
     case Columns::DisplayName:
-      return QLatin1String("Display Name");
+      return QCoreApplication::translate("InstanceItemModel", "Display Name");
     case Columns::ID:
-      return QLatin1String("ID");
+      return QCoreApplication::translate("InstanceItemModel", "ID");
     case Columns::IPAddress:
-      return QLatin1String("IP Address");
+      return QCoreApplication::translate("InstanceItemModel", "IP Address");
     case Columns::LastUpdated:
-      return QLatin1String("Last Updated");
+      return QCoreApplication::translate("InstanceItemModel", "Last Updated");
     case Columns::Owner:
-      return QLatin1String("Owner");
+      return QCoreApplication::translate("InstanceItemModel", "Owner");
     case Columns::Pool:
-      return QLatin1String("Pool");
+      return QCoreApplication::translate("InstanceItemModel", "Pool");
     case Columns::NumberOfColumns:
       CHECK(false);
       return {};

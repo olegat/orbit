@@ -66,6 +66,14 @@
 #include "CoreUtils.h"
 #include "absl/strings/str_format.h"
 
+// TODO(olegat) find better place for this absl::StrFrom(QString,...) wrapper
+namespace absl {
+template <typename... Args>
+std::string StrFormat(const QString& format, const Args&... args) {
+  return absl::StrFormat(std::string_view(format.toStdString()), args...);
+}
+}  // namespace absl
+
 OrbitCodeEditor* OrbitCodeEditor::GFileMapEditor;
 QWidget* OrbitCodeEditor::GFileMapWidget;
 
@@ -180,12 +188,12 @@ bool OrbitCodeEditor::loadCode(std::string a_Msg) {
       int lineNumber = atoi(tokens[2].c_str());
       gotoLine(lineNumber);
     } else {
-      std::string msg =
-          absl::StrFormat("Could not find %s (%s)\n", tokens[1].c_str(), tokens[2].c_str());
-      msg +=
-          "Please modify FileMapping.txt shown below if the source code is "
-          "available at another location.";
-      document()->setPlainText(msg.c_str());
+      QString msg = tr("Could not find %1 (%2)\n%3")
+                        .arg(QString(tokens[1].c_str()))
+                        .arg(QString(tokens[2].c_str()))
+                        .arg(tr("Please modify FileMapping.txt shown below if the source code is "
+                                "available at another location."));
+      document()->setPlainText(msg);
       return false;
     }
   }

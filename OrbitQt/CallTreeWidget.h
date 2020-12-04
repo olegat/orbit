@@ -39,17 +39,6 @@ class CallTreeWidget : public QWidget {
   void onSearchLineEditTextEdited(const QString& text);
 
  private:
-  static const QString kActionExpandRecursively;
-  static const QString kActionCollapseRecursively;
-  static const QString kActionCollapseChildrenRecursively;
-  static const QString kActionExpandAll;
-  static const QString kActionCollapseAll;
-  static const QString kActionLoadSymbols;
-  static const QString kActionSelect;
-  static const QString kActionDeselect;
-  static const QString kActionDisassembly;
-  static const QString kActionCopySelection;
-
   class HighlightCustomFilterSortFilterProxyModel : public QSortFilterProxyModel {
    public:
     explicit HighlightCustomFilterSortFilterProxyModel(QObject* parent)
@@ -96,6 +85,17 @@ class CallTreeWidget : public QWidget {
                        std::unique_ptr<QIdentityProxyModel> hide_values_proxy_model);
 
   void ResizeColumnsIfNecessary();
+
+  QString action_expand_recursively_;
+  QString action_collapse_recursively_;
+  QString action_collapse_children_recursively_;
+  QString action_expand_all_;
+  QString action_collapse_all_;
+  QString action_load_symbols_;
+  QString action_select_;
+  QString action_deselect_;
+  QString action_disassembly_;
+  QString action_copy_selection_;
 
   std::unique_ptr<Ui::CallTreeWidget> ui_;
   OrbitApp* app_ = nullptr;

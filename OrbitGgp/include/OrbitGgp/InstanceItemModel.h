@@ -17,6 +17,8 @@
 namespace OrbitGgp {
 
 class InstanceItemModel : public QAbstractItemModel {
+  Q_OBJECT
+
  public:
   explicit InstanceItemModel(QVector<Instance> instances = {}, QObject* parent = nullptr);
 

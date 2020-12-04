@@ -6,6 +6,7 @@
 
 #include "App.h"
 #include "GlUtils.h"
+#include "Localization.h"
 #include "TimeGraph.h"
 #include "absl/base/casts.h"
 
@@ -371,6 +372,7 @@ void CaptureWindow::MouseWheelMovedHorizontally(int /*x*/, int /*y*/, int delta,
   }
 }
 
+// TODO(olegat) KeyPressed is locale-dependent
 void CaptureWindow::KeyPressed(unsigned int key_code, bool ctrl, bool shift, bool alt) {
   UpdateSpecialKeys(ctrl, shift, alt);
 
@@ -759,13 +761,14 @@ void CaptureWindow::RenderHelpUi() {
 
 const char* CaptureWindow::GetHelpText() const {
   const char* help_message =
-      "Start/Stop Capture: 'X'\n"
-      "Pan: 'A','D' or \"Left Click + Drag\"\n"
-      "Zoom: 'W', 'S', Scroll or \"Ctrl + Right Click + Drag\"\n"
-      "Vertical Zoom: \"Ctrl + Scroll\"\n"
-      "Select: Left Click\n"
-      "Measure: \"Right Click + Drag\"\n"
-      "Toggle Help: 'H'";
+      QT_TRANSLATE_NOOP("CaptureWindow",
+                        "Start/Stop Capture: 'X'\n"
+                        "Pan: 'A','D' or \"Left Click + Drag\"\n"
+                        "Zoom: 'W', 'S', Scroll or \"Ctrl + Right Click + Drag\"\n"
+                        "Vertical Zoom: \"Ctrl + Scroll\"\n"
+                        "Select: Left Click\n"
+                        "Measure: \"Right Click + Drag\"\n"
+                        "Toggle Help: 'H'");
   return help_message;
 }
 

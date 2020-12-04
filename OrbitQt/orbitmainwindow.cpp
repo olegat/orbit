@@ -44,6 +44,14 @@ ABSL_DECLARE_FLAG(bool, devmode);
 ABSL_DECLARE_FLAG(bool, enable_tracepoint_feature);
 ABSL_DECLARE_FLAG(bool, enable_tutorials_feature);
 
+// TODO(olegat) find better place for this absl::StrFrom(QString,...) wrapper
+namespace absl {
+template <typename... Args>
+std::string StrFormat(const QString& format, const Args&... args) {
+  return absl::StrFormat(std::string_view(format.toStdString()), args...);
+}
+}  // namespace absl
+
 using orbit_grpc_protos::CrashOrbitServiceRequest_CrashType;
 using orbit_grpc_protos::CrashOrbitServiceRequest_CrashType_CHECK_FALSE;
 using orbit_grpc_protos::CrashOrbitServiceRequest_CrashType_NULL_POINTER_DEREFERENCE;
@@ -85,18 +93,18 @@ OrbitMainWindow::OrbitMainWindow(QApplication* a_App,
     setWindowTitle({});
   });
 
-  constexpr const char* kFinalizingCaptureMessage =
-      "<div align=\"left\">"
-      "Please wait while the capture is being finalized..."
-      "<ul>"
-      "<li>Waiting for the remaining capture data</li>"
-      "<li>Processing callstacks</li>"
-      "<li>Cleaning up dynamic instrumentation</li>"
-      "</ul>"
-      "</div>";
+  const QString kFinalizingCaptureMessage =
+      tr("<div align=\"left\">"
+         "Please wait while the capture is being finalized..."
+         "<ul>"
+         "<li>Waiting for the remaining capture data</li>"
+         "<li>Processing callstacks</li>"
+         "<li>Cleaning up dynamic instrumentation</li>"
+         "</ul>"
+         "</div>");
   auto finalizing_capture_dialog =
-      new QProgressDialog(kFinalizingCaptureMessage, "OK", 0, 0, this, Qt::Tool);
-  finalizing_capture_dialog->setWindowTitle("Finalizing capture");
+      new QProgressDialog(kFinalizingCaptureMessage, tr("OK"), 0, 0, this, Qt::Tool);
+  finalizing_capture_dialog->setWindowTitle(tr("Finalizing capture"));
   finalizing_capture_dialog->setModal(true);
   finalizing_capture_dialog->setWindowFlags(
       (finalizing_capture_dialog->windowFlags() | Qt::CustomizeWindowHint) &
@@ -123,9 +131,9 @@ OrbitMainWindow::OrbitMainWindow(QApplication* a_App,
   GOrbitApp->SetCaptureFailedCallback(capture_finished_callback);
   GOrbitApp->SetCaptureClearedCallback([this] { OnCaptureCleared(); });
 
-  auto loading_capture_dialog =
-      new QProgressDialog("Waiting for the capture to be loaded...", nullptr, 0, 0, this, Qt::Tool);
-  loading_capture_dialog->setWindowTitle("Loading capture");
+  auto loading_capture_dialog = new QProgressDialog(tr("Waiting for the capture to be loaded..."),
+                                                    nullptr, 0, 0, this, Qt::Tool);
+  loading_capture_dialog->setWindowTitle(tr("Loading capture"));
   loading_capture_dialog->setModal(true);
   loading_capture_dialog->setWindowFlags(
       (loading_capture_dialog->windowFlags() | Qt::CustomizeWindowHint) &
@@ -133,7 +141,7 @@ OrbitMainWindow::OrbitMainWindow(QApplication* a_App,
   loading_capture_dialog->setFixedSize(loading_capture_dialog->size());
 
   auto loading_capture_cancel_button = QPointer{new QPushButton{this}};
-  loading_capture_cancel_button->setText("Cancel");
+  loading_capture_cancel_button->setText(tr("Cancel"));
   QObject::connect(loading_capture_cancel_button, &QPushButton::clicked, this,
                    [loading_capture_dialog]() {
                      GOrbitApp->OnLoadCaptureCancelRequested();
@@ -469,9 +477,9 @@ void OrbitMainWindow::OnNewSelectionBottomUpView(
 }
 
 std::string OrbitMainWindow::OnGetSaveFileName(const std::string& extension) {
-  std::string filename =
-      QFileDialog::getSaveFileName(this, "Specify a file to save...", nullptr, extension.c_str())
-          .toStdString();
+  std::string filename = QFileDialog::getSaveFileName(this, tr("Specify a file to save..."),
+                                                      nullptr, extension.c_str())
+                             .toStdString();
   if (!filename.empty() && !absl::EndsWith(filename, extension)) {
     filename += extension;
   }
@@ -484,23 +492,23 @@ void OrbitMainWindow::OnSetClipboard(const std::string& text) {
 
 void OrbitMainWindow::on_actionReport_Missing_Feature_triggered() {
   if (!QDesktopServices::openUrl(
-          QUrl("https://community.stadia.dev/s/feature-requests", QUrl::StrictMode))) {
-    QMessageBox::critical(this, "Error opening URL",
-                          "Could not open community.stadia.dev/s/feature-request");
+          QUrl(tr("https://community.stadia.dev/s/feature-requests"), QUrl::StrictMode))) {
+    QMessageBox::critical(this, tr("Error opening URL"),
+                          tr("Could not open community.stadia.dev/s/feature-request"));
   }
 }
 
 void OrbitMainWindow::on_actionReport_Bug_triggered() {
   if (!QDesktopServices::openUrl(
-          QUrl("https://community.stadia.dev/s/contactsupport", QUrl::StrictMode))) {
-    QMessageBox::critical(this, "Error opening URL",
-                          "Could not open community.stadia.dev/s/contactsupport");
+          QUrl(tr("https://community.stadia.dev/s/contactsupport"), QUrl::StrictMode))) {
+    QMessageBox::critical(this, tr("Error opening URL"),
+                          tr("Could not open community.stadia.dev/s/contactsupport"));
   }
 }
 
 void OrbitMainWindow::on_actionAbout_triggered() {
   OrbitQt::OrbitAboutDialog dialog{this};
-  dialog.setWindowTitle("About");
+  dialog.setWindowTitle(tr("About"));
   dialog.SetVersionString(QCoreApplication::applicationVersion());
   dialog.SetBuildInformation(QString::fromStdString(OrbitCore::GetBuildReport()));
 
@@ -547,13 +555,13 @@ void OrbitMainWindow::OnFilterTracksTextChanged(const QString& text) {
 }
 
 void OrbitMainWindow::on_actionOpen_Preset_triggered() {
-  QStringList list = QFileDialog::getOpenFileNames(this, "Select a file to open...",
+  QStringList list = QFileDialog::getOpenFileNames(this, tr("Select a file to open..."),
                                                    Path::CreateOrGetPresetDir().c_str(), "*.opr");
   for (const auto& file : list) {
     ErrorMessageOr<void> result = GOrbitApp->OnLoadPreset(file.toStdString());
     if (result.has_error()) {
-      QMessageBox::critical(this, "Error loading session",
-                            absl::StrFormat("Could not load session from \"%s\":\n%s.",
+      QMessageBox::critical(this, tr("Error loading session"),
+                            absl::StrFormat(tr("Could not load session from \"%s\":\n%s."),
                                             file.toStdString(), result.error().message())
                                 .c_str());
     }
@@ -576,7 +584,7 @@ QPixmap QtGrab(OrbitMainWindow* a_Window) {
 }
 
 void OrbitMainWindow::on_actionSave_Preset_As_triggered() {
-  QString file = QFileDialog::getSaveFileName(this, "Specify a file to save...",
+  QString file = QFileDialog::getSaveFileName(this, tr("Specify a file to save..."),
                                               Path::CreateOrGetPresetDir().c_str(), "*.opr");
   if (file.isEmpty()) {
     return;
@@ -584,8 +592,8 @@ void OrbitMainWindow::on_actionSave_Preset_As_triggered() {
 
   ErrorMessageOr<void> result = GOrbitApp->OnSavePreset(file.toStdString());
   if (result.has_error()) {
-    QMessageBox::critical(this, "Error saving session",
-                          absl::StrFormat("Could not save session in \"%s\":\n%s.",
+    QMessageBox::critical(this, tr("Error saving session"),
+                          absl::StrFormat(tr("Could not save session in \"%s\":\n%s."),
                                           file.toStdString(), result.error().message())
                               .c_str());
   }
@@ -598,16 +606,16 @@ void OrbitMainWindow::on_actionClear_Capture_triggered() { GOrbitApp->ClearCaptu
 void OrbitMainWindow::on_actionHelp_triggered() { GOrbitApp->ToggleDrawHelp(); }
 
 void OrbitMainWindow::ShowCaptureOnSaveWarningIfNeeded() {
-  QSettings settings("The Orbit Authors", "Orbit Profiler");
+  QSettings settings(tr("The Orbit Authors", "Orbit Profiler"));
   const QString skip_capture_warning("SkipCaptureVersionWarning");
   if (!settings.value(skip_capture_warning, false).toBool()) {
     QMessageBox message_box;
     message_box.setText(
-        "Note: Captures saved with this version of Orbit might be incompatible "
-        "with future versions. Please check release notes for more "
-        "information");
+        tr("Note: Captures saved with this version of Orbit might be incompatible "
+           "with future versions. Please check release notes for more "
+           "information"));
     message_box.addButton(QMessageBox::Ok);
-    QCheckBox check_box("Don't show this message again.");
+    QCheckBox check_box(tr("Don't show this message again."));
     message_box.setCheckBox(&check_box);
 
     QObject::connect(&check_box, &QCheckBox::stateChanged,
@@ -620,18 +628,18 @@ void OrbitMainWindow::ShowCaptureOnSaveWarningIfNeeded() {
 }
 
 void OrbitMainWindow::ShowEmptyFrameTrackWarningIfNeeded(std::string_view function) {
-  QSettings settings("The Orbit Authors", "Orbit Profiler");
+  QSettings settings(tr("The Orbit Authors"), tr("Orbit Profiler"));
   const QString empty_frame_track_warning("EmptyFrameTrackWarning");
-  std::string message = absl::StrFormat(
-      "Frame track enabled for function %s, but since the function "
-      "does not have any hits in the current capture, a frame track "
-      "was not added to the capture.",
-      function);
+  std::string message =
+      absl::StrFormat(tr("Frame track enabled for function %s, but since the function "
+                         "does not have any hits in the current capture, a frame track "
+                         "was not added to the capture."),
+                      function);
   if (!settings.value(empty_frame_track_warning, false).toBool()) {
     QMessageBox message_box;
     message_box.setText(message.c_str());
     message_box.addButton(QMessageBox::Ok);
-    QCheckBox check_box("Don't show this message again.");
+    QCheckBox check_box(tr("Don't show this message again."));
     message_box.setCheckBox(&check_box);
 
     QObject::connect(&check_box, &QCheckBox::stateChanged,
@@ -648,7 +656,7 @@ void OrbitMainWindow::on_actionSave_Capture_triggered() {
 
   const CaptureData& capture_data = GOrbitApp->GetCaptureData();
   QString file = QFileDialog::getSaveFileName(
-      this, "Save capture...",
+      this, tr("Save capture..."),
       Path::JoinPath(
           {Path::CreateOrGetCaptureDir(), capture_serializer::GetCaptureFileName(capture_data)})
           .c_str(),
@@ -659,16 +667,17 @@ void OrbitMainWindow::on_actionSave_Capture_triggered() {
 
   ErrorMessageOr<void> result = GOrbitApp->OnSaveCapture(file.toStdString());
   if (result.has_error()) {
-    QMessageBox::critical(this, "Error saving capture",
-                          absl::StrFormat("Could not save capture in \"%s\":\n%s.",
+    QMessageBox::critical(this, tr("Error saving capture"),
+                          absl::StrFormat(tr("Could not save capture in \"%s\":\n%s."),
                                           file.toStdString(), result.error().message())
                               .c_str());
   }
 }
 
 void OrbitMainWindow::on_actionOpen_Capture_triggered() {
-  QString file = QFileDialog::getOpenFileName(
-      this, "Open capture...", QString::fromStdString(Path::CreateOrGetCaptureDir()), "*.orbit");
+  QString file = QFileDialog::getOpenFileName(this, tr("Open capture..."),
+                                              QString::fromStdString(Path::CreateOrGetCaptureDir()),
+                                              "*.orbit");
   if (file.isEmpty()) {
     return;
   }
@@ -686,7 +695,7 @@ void OrbitMainWindow::OpenDisassembly(std::string a_String, DisassemblyReport re
   auto* dialog = new OrbitDisassemblyDialog(this);
   dialog->SetText(std::move(a_String));
   dialog->SetDisassemblyReport(std::move(report));
-  dialog->setWindowTitle("Orbit Disassembly");
+  dialog->setWindowTitle(tr("Orbit Disassembly"));
   dialog->setAttribute(Qt::WA_DeleteOnClose);
   dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowMinimizeButtonHint |
                          Qt::WindowMaximizeButtonHint);
@@ -731,9 +740,9 @@ void OrbitMainWindow::closeEvent(QCloseEvent* event) {
   if (GOrbitApp->IsCapturing()) {
     event->ignore();
 
-    if (QMessageBox::question(this, "Capture in progress",
-                              "A capture is currently in progress. Do you want to abort the "
-                              "capture and exit Orbit?") == QMessageBox::Yes) {
+    if (QMessageBox::question(this, tr("Capture in progress"),
+                              tr("A capture is currently in progress. Do you want to abort the "
+                                 "capture and exit Orbit?")) == QMessageBox::Yes) {
       // We need for the capture to clean up - close as soon as this is done
       GOrbitApp->SetCaptureFailedCallback([&] { close(); });
       GOrbitApp->AbortCapture();

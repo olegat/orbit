@@ -34,7 +34,7 @@ OrbitStartupWindow::OrbitStartupWindow(QWidget* parent)
   const auto layout = QPointer{new QGridLayout{this}};
 
   // Top label
-  const auto label = QPointer{new QLabel{"Choose profiling target:"}};
+  const auto label = QPointer{new QLabel{tr("Choose profiling target:")}};
   layout->addWidget(label, 0, 0);
 
   // Refresh Button
@@ -65,11 +65,12 @@ OrbitStartupWindow::OrbitStartupWindow(QWidget* parent)
   const auto load_capture_button = button_box->button(QDialogButtonBox::StandardButton::Reset);
   CHECK(load_capture_button);
   load_capture_button->setIcon(QApplication::style()->standardIcon(QStyle::SP_DialogOpenButton));
-  load_capture_button->setText("Load Capture");
+  load_capture_button->setText(tr("Load Capture"));
 
   QObject::connect(load_capture_button, &QPushButton::clicked, this, [this, button_box]() {
     const QString file = QFileDialog::getOpenFileName(
-        this, "Open capture...", QString::fromStdString(Path::CreateOrGetCaptureDir()), "*.orbit");
+        this, tr("Open capture..."), QString::fromStdString(Path::CreateOrGetCaptureDir()),
+        "*.orbit");
     if (!file.isEmpty()) {
       result_ = file;
       accept();
@@ -77,21 +78,21 @@ OrbitStartupWindow::OrbitStartupWindow(QWidget* parent)
   });
 
   QObject::connect(button_box, &QDialogButtonBox::accepted, this, [this, button_box]() {
-    button_box->button(QDialogButtonBox::StandardButton::Ok)->setText("Loading...");
+    button_box->button(QDialogButtonBox::StandardButton::Ok)->setText(tr("Loading..."));
     button_box->button(QDialogButtonBox::StandardButton::Ok)->setEnabled(false);
     button_box->button(QDialogButtonBox::StandardButton::Reset)->setEnabled(false);
     CHECK(chosen_instance_);
     ggp_client_->GetSshInfoAsync(
         *chosen_instance_, [this, button_box](outcome::result<SshInfo> ssh_info) {
           // this callback is only called when ggp_client still exists.
-          button_box->button(QDialogButtonBox::StandardButton::Ok)->setText("Ok");
+          button_box->button(QDialogButtonBox::StandardButton::Ok)->setText(tr("Ok"));
           button_box->button(QDialogButtonBox::StandardButton::Ok)->setEnabled(true);
           button_box->button(QDialogButtonBox::StandardButton::Reset)->setEnabled(true);
           if (!ssh_info) {
             QMessageBox::critical(this, QApplication::applicationDisplayName(),
-                                  QString("Orbit was unable to retrieve the information "
-                                          "necessary to connect via ssh. The error message "
-                                          "was: %1")
+                                  tr("Orbit was unable to retrieve the information "
+                                     "necessary to connect via ssh. The error message "
+                                     "was: %1")
                                       .arg(QString::fromStdString(ssh_info.error().message())));
           } else {
             result_ = std::move(ssh_info.value());
@@ -126,7 +127,7 @@ void OrbitStartupWindow::ReloadInstances() {
   CHECK(ggp_client_);
 
   refresh_button_->setEnabled(false);
-  refresh_button_->setText("Loading...");
+  refresh_button_->setText(tr("Loading..."));
 
   ggp_client_->GetInstancesAsync([this](outcome::result<QVector<Instance>> instances) {
     refresh_button_->setEnabled(true);
@@ -134,8 +135,8 @@ void OrbitStartupWindow::ReloadInstances() {
 
     if (!instances) {
       QMessageBox::critical(this, QApplication::applicationDisplayName(),
-                            QString("Orbit was unable to retrieve the list of available Stadia "
-                                    "instances. The error message was: %1")
+                            tr("Orbit was unable to retrieve the list of available Stadia "
+                               "instances. The error message was: %1")
                                 .arg(QString::fromStdString(instances.error().message())));
     } else {
       model_->SetInstances(std::move(instances.value()));

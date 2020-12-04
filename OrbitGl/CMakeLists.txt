@@ -39,6 +39,7 @@ target_sources(
          IntrospectionWindow.h
          LiveFunctionsController.h
          LiveFunctionsDataView.h
+         Localization.h
          ManualInstrumentationManager.h
          ModulesDataView.h
          OpenGl.h

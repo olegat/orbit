@@ -5,6 +5,7 @@
 #include "orbittablemodel.h"
 
 #include <QColor>
+#include <QCoreApplication>
 #include <memory>
 
 OrbitTableModel::OrbitTableModel(DataView* data_view, QObject* parent,
@@ -30,7 +31,7 @@ QVariant OrbitTableModel::headerData(int section, Qt::Orientation orientation, i
       if (orientation == Qt::Horizontal &&
           section < static_cast<int>(data_view_->GetColumns().size())) {
         std::string header = data_view_->GetColumns()[section].header;
-        return QString::fromStdString(header);
+        return QCoreApplication::translate("OrbitTableView", header.c_str());
       } else if (orientation == Qt::Vertical) {
         return section;
       } else {

@@ -5,6 +5,7 @@
 #include "TracepointsDataView.h"
 
 #include "App.h"
+#include "Localization.h"
 
 namespace {
 static const std::string kMenuActionSelect = "Hook";
@@ -17,9 +18,12 @@ const std::vector<DataView::Column>& TracepointsDataView::GetColumns() {
   static const std::vector<Column>& columns = [] {
     std::vector<Column> columns;
     columns.resize(kNumColumns);
-    columns[kColumnSelected] = {"Selected", .0f, SortingOrder::kDescending};
-    columns[kColumnCategory] = {"Category", .5f, SortingOrder::kAscending};
-    columns[kColumnName] = {"Name", .2f, SortingOrder::kAscending};
+    columns[kColumnSelected] = {QT_TRANSLATE_NOOP("OrbitTableView", "Selected"), .0f,
+                                SortingOrder::kDescending};
+    columns[kColumnCategory] = {QT_TRANSLATE_NOOP("OrbitTableView", "Category"), .5f,
+                                SortingOrder::kAscending};
+    columns[kColumnName] = {QT_TRANSLATE_NOOP("OrbitTableView", "Name"), .2f,
+                            SortingOrder::kAscending};
     return columns;
   }();
   return columns;

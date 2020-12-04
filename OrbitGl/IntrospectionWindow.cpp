@@ -5,6 +5,7 @@
 #include "IntrospectionWindow.h"
 
 #include "App.h"
+#include "Localization.h"
 
 using orbit_client_protos::TimerInfo;
 
@@ -15,10 +16,10 @@ IntrospectionWindow::IntrospectionWindow(uint32_t font_size) : CaptureWindow(fon
 IntrospectionWindow::~IntrospectionWindow() { StopIntrospection(); }
 
 const char* IntrospectionWindow::GetHelpText() const {
-  const char* help_message =
-      "Client Side Introspection\n\n"
-      "Start/Stop Capture: 'X'\n"
-      "Toggle Help: 'H'";
+  const char* help_message = QT_TRANSLATE_NOOP("IntrospectionWindow",
+                                               "Client Side Introspection\n\n"
+                                               "Start/Stop Capture: 'X'\n"
+                                               "Toggle Help: 'H'");
   return help_message;
 }
 

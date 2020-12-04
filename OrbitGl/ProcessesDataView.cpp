@@ -8,6 +8,7 @@
 
 #include "App.h"
 #include "Callstack.h"
+#include "Localization.h"
 #include "ModulesDataView.h"
 #include "absl/strings/str_format.h"
 
@@ -20,9 +21,12 @@ const std::vector<DataView::Column>& ProcessesDataView::GetColumns() {
   static const std::vector<Column> columns = [] {
     std::vector<Column> columns;
     columns.resize(kNumColumns);
-    columns[kColumnPid] = {"PID", .2f, SortingOrder::kAscending};
-    columns[kColumnName] = {"Name", .6f, SortingOrder::kAscending};
-    columns[kColumnCpu] = {"CPU", .0f, SortingOrder::kDescending};
+    columns[kColumnPid] = {QT_TRANSLATE_NOOP("OrbitTableView", "PID"), .2f,
+                           SortingOrder::kAscending};
+    columns[kColumnName] = {QT_TRANSLATE_NOOP("OrbitTableView", "Name"), .6f,
+                            SortingOrder::kAscending};
+    columns[kColumnCpu] = {QT_TRANSLATE_NOOP("OrbitTableView", "CPU"), .0f,
+                           SortingOrder::kDescending};
     return columns;
   }();
   return columns;
@@ -45,6 +49,10 @@ std::string ProcessesDataView::GetValue(int row, int col) {
 
 std::string ProcessesDataView::GetToolTip(int row, int /*column*/) {
   return GetProcess(row).command_line();
+}
+
+std::string ProcessesDataView::GetLabel() {
+  return QT_TRANSLATE_NOOP("OrbitTableView", "Processes");
 }
 
 #define ORBIT_PROC_SORT(Member)                                                      \

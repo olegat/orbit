@@ -8,6 +8,7 @@
 
 #include "App.h"
 #include "CallStackDataView.h"
+#include "Localization.h"
 #include "OrbitClientData/FunctionUtils.h"
 #include "OrbitClientData/ModuleData.h"
 #include "Path.h"
@@ -22,14 +23,22 @@ const std::vector<DataView::Column>& SamplingReportDataView::GetColumns() {
   static const std::vector<Column> columns = [] {
     std::vector<Column> columns;
     columns.resize(kNumColumns);
-    columns[kColumnSelected] = {"Hooked", .0f, SortingOrder::kDescending};
-    columns[kColumnFunctionName] = {"Name", .5f, SortingOrder::kAscending};
-    columns[kColumnExclusive] = {"Exclusive", .0f, SortingOrder::kDescending};
-    columns[kColumnInclusive] = {"Inclusive", .0f, SortingOrder::kDescending};
-    columns[kColumnModuleName] = {"Module", .0f, SortingOrder::kAscending};
-    columns[kColumnFile] = {"File", .0f, SortingOrder::kAscending};
-    columns[kColumnLine] = {"Line", .0f, SortingOrder::kAscending};
-    columns[kColumnAddress] = {"Address", .0f, SortingOrder::kAscending};
+    columns[kColumnSelected] = {QT_TRANSLATE_NOOP("OrbitTableView", "Hooked"), .0f,
+                                SortingOrder::kDescending};
+    columns[kColumnFunctionName] = {QT_TRANSLATE_NOOP("OrbitTableView", "Name"), .5f,
+                                    SortingOrder::kAscending};
+    columns[kColumnExclusive] = {QT_TRANSLATE_NOOP("OrbitTableView", "Exclusive"), .0f,
+                                 SortingOrder::kDescending};
+    columns[kColumnInclusive] = {QT_TRANSLATE_NOOP("OrbitTableView", "Inclusive"), .0f,
+                                 SortingOrder::kDescending};
+    columns[kColumnModuleName] = {QT_TRANSLATE_NOOP("OrbitTableView", "Module"), .0f,
+                                  SortingOrder::kAscending};
+    columns[kColumnFile] = {QT_TRANSLATE_NOOP("OrbitTableView", "File"), .0f,
+                            SortingOrder::kAscending};
+    columns[kColumnLine] = {QT_TRANSLATE_NOOP("OrbitTableView", "Line"), .0f,
+                            SortingOrder::kAscending};
+    columns[kColumnAddress] = {QT_TRANSLATE_NOOP("OrbitTableView", "Address"), .0f,
+                               SortingOrder::kAscending};
     return columns;
   }();
   return columns;

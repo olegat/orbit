@@ -132,7 +132,7 @@ void TutorialOverlay::StartActiveStep() {
   }
 
   ui_->btnPrev->setEnabled(!ActiveStepIsFirstInSection());
-  ui_->btnNext->setText(ActiveStepIsLastInSection() ? "Got it!" : "Next");
+  ui_->btnNext->setText(ActiveStepIsLastInSection() ? tr("Got it!") : tr("Next"));
 
   UpdateProgressIndicators();
 
@@ -311,7 +311,7 @@ bool TutorialOverlay::VerifyActiveStep() {
     if (verify_complete.has_value()) {
       // This is mostly to allow unit testing...
       if (parentWidget() != nullptr && parentWidget()->isVisible()) {
-        QMessageBox::critical(this, "Wizard Error",
+        QMessageBox::critical(this, tr("Wizard Error"),
                               QString::fromStdString(verify_complete.value()));
       }
       return false;

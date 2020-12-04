@@ -5,6 +5,7 @@
 #include "ModulesDataView.h"
 
 #include "App.h"
+#include "Localization.h"
 #include "OrbitClientData/ProcessData.h"
 #include "absl/flags/flag.h"
 
@@ -16,11 +17,16 @@ const std::vector<DataView::Column>& ModulesDataView::GetColumns() {
   static const std::vector<Column> columns = [] {
     std::vector<Column> columns;
     columns.resize(kNumColumns);
-    columns[kColumnName] = {"Name", .2f, SortingOrder::kAscending};
-    columns[kColumnPath] = {"Path", .5f, SortingOrder::kAscending};
-    columns[kColumnAddressRange] = {"Address Range", .15f, SortingOrder::kAscending};
-    columns[kColumnFileSize] = {"File Size", .0f, SortingOrder::kDescending};
-    columns[kColumnLoaded] = {"Loaded", .0f, SortingOrder::kDescending};
+    columns[kColumnName] = {QT_TRANSLATE_NOOP("OrbitTableView", "Name"), .2f,
+                            SortingOrder::kAscending};
+    columns[kColumnPath] = {QT_TRANSLATE_NOOP("OrbitTableView", "Path"), .5f,
+                            SortingOrder::kAscending};
+    columns[kColumnAddressRange] = {QT_TRANSLATE_NOOP("OrbitTableView", "Address Range"), .15f,
+                                    SortingOrder::kAscending};
+    columns[kColumnFileSize] = {QT_TRANSLATE_NOOP("OrbitTableView", "File Size"), .0f,
+                                SortingOrder::kDescending};
+    columns[kColumnLoaded] = {QT_TRANSLATE_NOOP("OrbitTableView", "Loaded"), .0f,
+                              SortingOrder::kDescending};
     return columns;
   }();
   return columns;
@@ -86,8 +92,10 @@ void ModulesDataView::DoSort() {
   }
 }
 
-const std::string ModulesDataView::kMenuActionLoadSymbols = "Load Symbols";
-const std::string ModulesDataView::kMenuActionVerifyFramePointers = "Verify Frame Pointers";
+const std::string ModulesDataView::kMenuActionLoadSymbols =
+    QT_TRANSLATE_NOOP("OrbitTableView", "Load Symbols");
+const std::string ModulesDataView::kMenuActionVerifyFramePointers =
+    QT_TRANSLATE_NOOP("OrbitTableView", "Verify Frame Pointers");
 
 std::vector<std::string> ModulesDataView::GetContextMenu(int clicked_index,
                                                          const std::vector<int>& selected_indices) {
@@ -211,3 +219,5 @@ bool ModulesDataView::GetDisplayColor(int row, int /*column*/, unsigned char& re
     return true;
   }
 }
+
+std::string ModulesDataView::GetLabel() { return QT_TRANSLATE_NOOP("OrbitTableView", "Modules"); }

@@ -5,6 +5,7 @@
 #include "FunctionsDataView.h"
 
 #include "App.h"
+#include "Localization.h"
 #include "OrbitClientData/FunctionUtils.h"
 #include "absl/flags/flag.h"
 #include "absl/strings/str_format.h"
@@ -21,13 +22,20 @@ const std::vector<DataView::Column>& FunctionsDataView::GetColumns() {
   static const std::vector<Column> columns = [] {
     std::vector<Column> columns;
     columns.resize(kNumColumns);
-    columns[kColumnSelected] = {"Hooked", .0f, SortingOrder::kDescending};
-    columns[kColumnName] = {"Function", .65f, SortingOrder::kAscending};
-    columns[kColumnSize] = {"Size", .0f, SortingOrder::kAscending};
-    columns[kColumnFile] = {"File", .0f, SortingOrder::kAscending};
-    columns[kColumnLine] = {"Line", .0f, SortingOrder::kAscending};
-    columns[kColumnModule] = {"Module", .0f, SortingOrder::kAscending};
-    columns[kColumnAddress] = {"Address", .0f, SortingOrder::kAscending};
+    columns[kColumnSelected] = {QT_TRANSLATE_NOOP("OrbitTableView", "Hooked"), .0f,
+                                SortingOrder::kDescending};
+    columns[kColumnName] = {QT_TRANSLATE_NOOP("OrbitTableView", "Function"), .65f,
+                            SortingOrder::kAscending};
+    columns[kColumnSize] = {QT_TRANSLATE_NOOP("OrbitTableView", "Size"), .0f,
+                            SortingOrder::kAscending};
+    columns[kColumnFile] = {QT_TRANSLATE_NOOP("OrbitTableView", "File"), .0f,
+                            SortingOrder::kAscending};
+    columns[kColumnLine] = {QT_TRANSLATE_NOOP("OrbitTableView", "Line"), .0f,
+                            SortingOrder::kAscending};
+    columns[kColumnModule] = {QT_TRANSLATE_NOOP("OrbitTableView", "Module"), .0f,
+                              SortingOrder::kAscending};
+    columns[kColumnAddress] = {QT_TRANSLATE_NOOP("OrbitTableView", "Address"), .0f,
+                               SortingOrder::kAscending};
     return columns;
   }();
   return columns;

@@ -13,6 +13,8 @@
 namespace OrbitQt {
 
 class OrbitAboutDialog : public QDialog {
+  Q_OBJECT
+
  public:
   explicit OrbitAboutDialog(QWidget* parent = nullptr);
 

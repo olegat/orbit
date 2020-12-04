@@ -6,6 +6,7 @@
 
 #include "App.h"
 #include "LiveFunctionsController.h"
+#include "Localization.h"
 #include "OrbitBase/Profiling.h"
 #include "OrbitClientData/FunctionUtils.h"
 #include "TextBox.h"
@@ -26,15 +27,24 @@ const std::vector<DataView::Column>& LiveFunctionsDataView::GetColumns() {
   static const std::vector<Column> columns = [] {
     std::vector<Column> columns;
     columns.resize(kNumColumns);
-    columns[kColumnSelected] = {"Hooked", .0f, SortingOrder::kDescending};
-    columns[kColumnName] = {"Function", .4f, SortingOrder::kAscending};
-    columns[kColumnCount] = {"Count", .0f, SortingOrder::kDescending};
-    columns[kColumnTimeTotal] = {"Total", .075f, SortingOrder::kDescending};
-    columns[kColumnTimeAvg] = {"Avg", .075f, SortingOrder::kDescending};
-    columns[kColumnTimeMin] = {"Min", .075f, SortingOrder::kDescending};
-    columns[kColumnTimeMax] = {"Max", .075f, SortingOrder::kDescending};
-    columns[kColumnModule] = {"Module", .1f, SortingOrder::kAscending};
-    columns[kColumnAddress] = {"Address", .0f, SortingOrder::kAscending};
+    columns[kColumnSelected] = {QT_TRANSLATE_NOOP("OrbitTableView", "Hooked"), .0f,
+                                SortingOrder::kDescending};
+    columns[kColumnName] = {QT_TRANSLATE_NOOP("OrbitTableView", "Function"), .4f,
+                            SortingOrder::kAscending};
+    columns[kColumnCount] = {QT_TRANSLATE_NOOP("OrbitTableView", "Count"), .0f,
+                             SortingOrder::kDescending};
+    columns[kColumnTimeTotal] = {QT_TRANSLATE_NOOP("OrbitTableView", "Total"), .075f,
+                                 SortingOrder::kDescending};
+    columns[kColumnTimeAvg] = {QT_TRANSLATE_NOOP("OrbitTableView", "Avg"), .075f,
+                               SortingOrder::kDescending};
+    columns[kColumnTimeMin] = {QT_TRANSLATE_NOOP("OrbitTableView", "Min"), .075f,
+                               SortingOrder::kDescending};
+    columns[kColumnTimeMax] = {QT_TRANSLATE_NOOP("OrbitTableView", "Max"), .075f,
+                               SortingOrder::kDescending};
+    columns[kColumnModule] = {QT_TRANSLATE_NOOP("OrbitTableView", "Module"), .1f,
+                              SortingOrder::kAscending};
+    columns[kColumnAddress] = {QT_TRANSLATE_NOOP("OrbitTableView", "Address"), .0f,
+                               SortingOrder::kAscending};
     return columns;
   }();
   return columns;
@@ -141,16 +151,26 @@ void LiveFunctionsDataView::DoSort() {
   }
 }
 
-const std::string LiveFunctionsDataView::kMenuActionSelect = "Hook";
-const std::string LiveFunctionsDataView::kMenuActionUnselect = "Unhook";
-const std::string LiveFunctionsDataView::kMenuActionJumpToFirst = "Jump to first";
-const std::string LiveFunctionsDataView::kMenuActionJumpToLast = "Jump to last";
-const std::string LiveFunctionsDataView::kMenuActionJumpToMin = "Jump to min";
-const std::string LiveFunctionsDataView::kMenuActionJumpToMax = "Jump to max";
-const std::string LiveFunctionsDataView::kMenuActionDisassembly = "Go to Disassembly";
-const std::string LiveFunctionsDataView::kMenuActionIterate = "Add iterator(s)";
-const std::string LiveFunctionsDataView::kMenuActionEnableFrameTrack = "Enable frame track(s)";
-const std::string LiveFunctionsDataView::kMenuActionDisableFrameTrack = "Disable frame track(s)";
+const std::string LiveFunctionsDataView::kMenuActionSelect =
+    QT_TRANSLATE_NOOP("OrbitTableView", "Hook");
+const std::string LiveFunctionsDataView::kMenuActionUnselect =
+    QT_TRANSLATE_NOOP("OrbitTableView", "Unhook");
+const std::string LiveFunctionsDataView::kMenuActionJumpToFirst =
+    QT_TRANSLATE_NOOP("OrbitTableView", "Jump to first");
+const std::string LiveFunctionsDataView::kMenuActionJumpToLast =
+    QT_TRANSLATE_NOOP("OrbitTableView", "Jump to last");
+const std::string LiveFunctionsDataView::kMenuActionJumpToMin =
+    QT_TRANSLATE_NOOP("OrbitTableView", "Jump to min");
+const std::string LiveFunctionsDataView::kMenuActionJumpToMax =
+    QT_TRANSLATE_NOOP("OrbitTableView", "Jump to max");
+const std::string LiveFunctionsDataView::kMenuActionDisassembly =
+    QT_TRANSLATE_NOOP("OrbitTableView", "Go to Disassembly");
+const std::string LiveFunctionsDataView::kMenuActionIterate =
+    QT_TRANSLATE_NOOP("OrbitTableView", "Add iterator(s)");
+const std::string LiveFunctionsDataView::kMenuActionEnableFrameTrack =
+    QT_TRANSLATE_NOOP("OrbitTableView", "Enable frame track(s)");
+const std::string LiveFunctionsDataView::kMenuActionDisableFrameTrack =
+    QT_TRANSLATE_NOOP("OrbitTableView", "Disable frame track(s)");
 
 std::vector<std::string> LiveFunctionsDataView::GetContextMenu(
     int clicked_index, const std::vector<int>& selected_indices) {

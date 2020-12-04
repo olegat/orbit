@@ -18,6 +18,17 @@ using orbit_client_protos::FunctionInfo;
 
 CallTreeWidget::CallTreeWidget(QWidget* parent)
     : QWidget{parent}, ui_{std::make_unique<Ui::CallTreeWidget>()} {
+  action_expand_recursively_ = tr("&Expand recursively");
+  action_collapse_recursively_ = tr("&Collapse recursively");
+  action_collapse_children_recursively_ = tr("Collapse children recursively");
+  action_expand_all_ = tr("Expand all");
+  action_collapse_all_ = tr("Collapse all");
+  action_load_symbols_ = tr("&Load Symbols");
+  action_select_ = tr("&Hook");
+  action_deselect_ = tr("&Unhook");
+  action_disassembly_ = tr("Go to &Disassembly");
+  action_copy_selection_ = tr("Copy Selection");
+
   ui_->setupUi(this);
   ui_->callTreeTreeView->setItemDelegateForColumn(
       CallTreeViewItemModel::kInclusive, new ProgressBarItemDelegate{ui_->callTreeTreeView});
@@ -160,18 +171,6 @@ void CallTreeWidget::onCopyKeySequencePressed() {
       BuildStringFromIndices(ui_->callTreeTreeView->selectionModel()->selectedIndexes()));
 }
 
-const QString CallTreeWidget::kActionExpandRecursively = QStringLiteral("&Expand recursively");
-const QString CallTreeWidget::kActionCollapseRecursively = QStringLiteral("&Collapse recursively");
-const QString CallTreeWidget::kActionCollapseChildrenRecursively =
-    QStringLiteral("Collapse children recursively");
-const QString CallTreeWidget::kActionExpandAll = QStringLiteral("Expand all");
-const QString CallTreeWidget::kActionCollapseAll = QStringLiteral("Collapse all");
-const QString CallTreeWidget::kActionLoadSymbols = QStringLiteral("&Load Symbols");
-const QString CallTreeWidget::kActionSelect = QStringLiteral("&Hook");
-const QString CallTreeWidget::kActionDeselect = QStringLiteral("&Unhook");
-const QString CallTreeWidget::kActionDisassembly = QStringLiteral("Go to &Disassembly");
-const QString CallTreeWidget::kActionCopySelection = QStringLiteral("Copy Selection");
-
 static void ExpandRecursively(QTreeView* tree_view, const QModelIndex& index) {
   if (!index.isValid()) {
     return;
@@ -304,56 +303,56 @@ void CallTreeWidget::onCustomContextMenuRequested(const QPoint& point) {
   bool enable_copy = ui_->callTreeTreeView->selectionModel()->hasSelection();
 
   QMenu menu{ui_->callTreeTreeView};
-  menu.addAction(kActionExpandRecursively)->setEnabled(enable_expand_recursively);
-  menu.addAction(kActionCollapseRecursively)->setEnabled(enable_collapse_recursively);
-  menu.addAction(kActionCollapseChildrenRecursively)->setEnabled(enable_collapse_recursively);
+  menu.addAction(action_expand_recursively_)->setEnabled(enable_expand_recursively);
+  menu.addAction(action_collapse_recursively_)->setEnabled(enable_collapse_recursively);
+  menu.addAction(action_collapse_children_recursively_)->setEnabled(enable_collapse_recursively);
   menu.addSeparator();
-  menu.addAction(kActionExpandAll);
-  menu.addAction(kActionCollapseAll);
+  menu.addAction(action_expand_all_);
+  menu.addAction(action_collapse_all_);
   menu.addSeparator();
-  menu.addAction(kActionLoadSymbols)->setEnabled(enable_load);
-  menu.addAction(kActionSelect)->setEnabled(enable_select);
-  menu.addAction(kActionDeselect)->setEnabled(enable_deselect);
-  menu.addAction(kActionDisassembly)->setEnabled(enable_disassembly);
+  menu.addAction(action_load_symbols_)->setEnabled(enable_load);
+  menu.addAction(action_select_)->setEnabled(enable_select);
+  menu.addAction(action_deselect_)->setEnabled(enable_deselect);
+  menu.addAction(action_disassembly_)->setEnabled(enable_disassembly);
   menu.addSeparator();
-  menu.addAction(kActionCopySelection)->setEnabled(enable_copy);
+  menu.addAction(action_copy_selection_)->setEnabled(enable_copy);
 
   QAction* action = menu.exec(ui_->callTreeTreeView->mapToGlobal(point));
   if (action == nullptr) {
     return;
   }
 
-  if (action->text() == kActionExpandRecursively) {
+  if (action->text() == action_expand_recursively_) {
     for (const QModelIndex& selected_index : selected_tree_indices) {
       ExpandRecursively(ui_->callTreeTreeView, selected_index);
     }
-  } else if (action->text() == kActionCollapseRecursively) {
+  } else if (action->text() == action_collapse_recursively_) {
     for (const QModelIndex& selected_index : selected_tree_indices) {
       CollapseRecursively(ui_->callTreeTreeView, selected_index);
     }
-  } else if (action->text() == kActionCollapseChildrenRecursively) {
+  } else if (action->text() == action_collapse_children_recursively_) {
     for (const QModelIndex& selected_index : selected_tree_indices) {
       CollapseChildrenRecursively(ui_->callTreeTreeView, selected_index);
     }
-  } else if (action->text() == kActionExpandAll) {
+  } else if (action->text() == action_expand_all_) {
     ui_->callTreeTreeView->expandAll();
-  } else if (action->text() == kActionCollapseAll) {
+  } else if (action->text() == action_collapse_all_) {
     ui_->callTreeTreeView->collapseAll();
-  } else if (action->text() == kActionLoadSymbols) {
+  } else if (action->text() == action_load_symbols_) {
     app_->LoadModules(modules_to_load);
-  } else if (action->text() == kActionSelect) {
+  } else if (action->text() == action_select_) {
     for (const FunctionInfo* function : functions) {
       app_->SelectFunction(*function);
     }
-  } else if (action->text() == kActionDeselect) {
+  } else if (action->text() == action_deselect_) {
     for (const FunctionInfo* function : functions) {
       app_->DeselectFunction(*function);
     }
-  } else if (action->text() == kActionDisassembly) {
+  } else if (action->text() == action_disassembly_) {
     for (const FunctionInfo* function : functions) {
       app_->Disassemble(app_->GetCaptureData().process_id(), *function);
     }
-  } else if (action->text() == kActionCopySelection) {
+  } else if (action->text() == action_copy_selection_) {
     app_->SetClipboard(
         BuildStringFromIndices(ui_->callTreeTreeView->selectionModel()->selectedIndexes()));
   }
@@ -454,7 +453,7 @@ QVariant CallTreeWidget::HookedIdentityProxyModel::data(const QModelIndex& index
   }
 
   if (role == Qt::ToolTipRole) {
-    static const QString kTooltipHookedPrefix = QStringLiteral("[HOOKED] ");
+    static const QString kTooltipHookedPrefix = tr("[HOOKED] ");
     return kTooltipHookedPrefix + data.toString();
   }
   static const QString kDisplayHookedPrefix =

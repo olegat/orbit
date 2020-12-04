@@ -16,7 +16,7 @@ void OrbitAboutDialog::SetLicenseText(const QString& text) {
 }
 
 void OrbitAboutDialog::SetVersionString(const QString& version) {
-  ui_->versionLabel->setText(QString{"Version %1"}.arg(version));
+  ui_->versionLabel->setText(tr("Version %1").arg(version));
 }
 
 void OrbitAboutDialog::SetBuildInformation(const QString& build_info) {

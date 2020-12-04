@@ -20,7 +20,7 @@ class PresetsDataView : public DataView {
                                           const std::vector<int>& selected_indices) override;
   std::string GetValue(int row, int column) override;
   std::string GetToolTip(int row, int column) override;
-  std::string GetLabel() override { return "Presets"; }
+  std::string GetLabel() override;
 
   void OnDataChanged() override;
   void OnContextMenu(const std::string& action, int menu_index,

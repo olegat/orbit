@@ -11,6 +11,7 @@
 
 #include "App.h"
 #include "Callstack.h"
+#include "Localization.h"
 #include "ModulesDataView.h"
 #include "Path.h"
 #include "PresetLoadState.h"
@@ -20,10 +21,11 @@
 using orbit_client_protos::PresetFile;
 using orbit_client_protos::PresetInfo;
 
-constexpr const char* kLoadableColumnName = "Loadable";
-constexpr const char* kPresetColumnName = "Preset";
-constexpr const char* kModulesColumnName = "Modules";
-constexpr const char* kHookedFunctionsColumnName = "Hooked Functions";
+constexpr const char* kLoadableColumnName = QT_TRANSLATE_NOOP("OrbitTableView", "Loadable");
+constexpr const char* kPresetColumnName = QT_TRANSLATE_NOOP("OrbitTableView", "Preset");
+constexpr const char* kModulesColumnName = QT_TRANSLATE_NOOP("OrbitTableView", "Modules");
+constexpr const char* kHookedFunctionsColumnName =
+    QT_TRANSLATE_NOOP("OrbitTableView", "Hooked Functions");
 
 constexpr const float kLoadableColumnWidth = 0.14f;
 constexpr const float kPresetColumnWidth = 0.34f;
@@ -87,6 +89,8 @@ std::string PresetsDataView::GetToolTip(int row, int /*column*/) {
   const PresetFile& preset = *GetPreset(row);
   return preset.file_name();
 }
+
+std::string PresetsDataView::GetLabel() { return QT_TRANSLATE_NOOP("OrbitTableView", "Presets"); }
 
 void PresetsDataView::DoSort() {
   bool ascending = sorting_orders_[sorting_column_] == SortingOrder::kAscending;

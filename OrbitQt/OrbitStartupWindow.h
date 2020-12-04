@@ -25,6 +25,8 @@
 namespace OrbitQt {
 
 class OrbitStartupWindow : public QDialog {
+  Q_OBJECT
+
   using Client = OrbitGgp::Client;
   using Instance = OrbitGgp::Instance;
   using InstanceItemModel = OrbitGgp::InstanceItemModel;

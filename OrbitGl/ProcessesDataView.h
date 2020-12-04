@@ -17,7 +17,7 @@ class ProcessesDataView final : public DataView {
   int GetDefaultSortingColumn() override { return kColumnCpu; }
   std::string GetValue(int row, int column) override;
   std::string GetToolTip(int row, int column) override;
-  std::string GetLabel() override { return "Processes"; }
+  std::string GetLabel() override;
 
   void OnSelect(int index) override;
   bool SelectProcess(const std::string& process_name);

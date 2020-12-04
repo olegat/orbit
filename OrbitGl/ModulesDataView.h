@@ -24,7 +24,7 @@ class ModulesDataView : public DataView {
   bool WantsDisplayColor() override { return true; }
   bool GetDisplayColor(int row, int column, unsigned char& red, unsigned char& green,
                        unsigned char& blue) override;
-  std::string GetLabel() override { return "Modules"; }
+  std::string GetLabel() override;
   bool HasRefreshButton() const override { return true; }
   void OnRefreshButtonClicked() override;
   void UpdateModules(const ProcessData* process);

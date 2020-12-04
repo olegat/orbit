@@ -26,6 +26,14 @@
 
 ABSL_DECLARE_FLAG(bool, devmode);
 
+// TODO(olegat) find better place for this absl::StrFrom(QString,...) wrapper
+namespace absl {
+template <typename... Args>
+std::string StrFormat(const QString& format, const Args&... args) {
+  return absl::StrFormat(std::string_view(format.toStdString()), args...);
+}
+}  // namespace absl
+
 static const std::string kLocalhost = "127.0.0.1";
 static const std::string kDebDestinationPath = "/tmp/orbitprofiler.deb";
 static const std::string kSigDestinationPath = "/tmp/orbitprofiler.deb.asc";
@@ -130,9 +138,10 @@ void ServiceDeployManager::Cancel() {
 
 outcome::result<bool> ServiceDeployManager::CheckIfInstalled() {
   CHECK(QThread::currentThread() == thread());
-  emit statusMessage(QString("Checking if OrbitService is already installed in version %1 on the "
-                             "remote instance.")
-                         .arg(QApplication::applicationVersion()));
+  emit statusMessage(
+      QString(tr("Checking if OrbitService is already installed in version %1 on the "
+                 "remote instance."))
+          .arg(QApplication::applicationVersion()));
 
   auto version = QApplication::applicationVersion().toStdString();
   if (!version.empty() && version.front() == 'v') {
@@ -158,10 +167,10 @@ outcome::result<bool> ServiceDeployManager::CheckIfInstalled() {
   OUTCOME_TRY(result, loop.exec());
   if (result == 0) {
     // Already installed
-    emit statusMessage("The correct version of OrbitService is already installed.");
+    emit statusMessage(tr("The correct version of OrbitService is already installed."));
     return outcome::success(true);
   } else {
-    emit statusMessage("The correct version of OrbitService is not yet installed.");
+    emit statusMessage(tr("The correct version of OrbitService is not yet installed."));
     return outcome::success(false);
   }
 }
@@ -169,7 +178,7 @@ outcome::result<bool> ServiceDeployManager::CheckIfInstalled() {
 outcome::result<uint16_t> ServiceDeployManager::StartTunnel(
     std::optional<OrbitSshQt::Tunnel>* tunnel, uint16_t port) {
   CHECK(QThread::currentThread() == thread());
-  emit statusMessage("Setting up port forwarding...");
+  emit statusMessage(tr("Setting up port forwarding..."));
   LOG("Setting up tunnel on port %d", grpc_port_.grpc_port);
 
   tunnel->emplace(&session_.value(), kLocalhost, port, this);
@@ -249,7 +258,7 @@ void ServiceDeployManager::StopSftpChannel() { (void)StopSftpChannel(sftp_channe
 
 outcome::result<void> ServiceDeployManager::CopyOrbitServicePackage() {
   CHECK(QThread::currentThread() == thread());
-  emit statusMessage("Copying OrbitService package to the remote instance...");
+  emit statusMessage(tr("Copying OrbitService package to the remote instance..."));
 
   auto& config = std::get<SignedDebianPackageDeployment>(*deployment_configuration_);
 
@@ -263,7 +272,7 @@ outcome::result<void> ServiceDeployManager::CopyOrbitServicePackage() {
                                         FileMode::kUserWritable),
                        Error::kCouldNotUploadSignature));
 
-  emit statusMessage("Finished copying the OrbitService package to the remote instance.");
+  emit statusMessage(tr("Finished copying the OrbitService package to the remote instance."));
   return outcome::success();
 }
 
@@ -286,7 +295,7 @@ ErrorMessageOr<void> ServiceDeployManager::CopyFileToLocalImpl(std::string_view 
 
   if (!sftp_channel) {
     return ErrorMessage(
-        absl::StrFormat(R"(Unable to start sftp channel to copy the remote "%s" to "%s": %s)",
+        absl::StrFormat(tr(R"(Unable to start sftp channel to copy the remote "%s" to "%s": %s)"),
                         source, destination, sftp_channel.error().message()));
   }
 
@@ -303,7 +312,7 @@ ErrorMessageOr<void> ServiceDeployManager::CopyFileToLocalImpl(std::string_view 
 
   auto result = loop.exec();
   if (!result) {
-    return ErrorMessage(absl::StrFormat(R"(Error copying remote "%s" to "%s": %s)", source,
+    return ErrorMessage(absl::StrFormat(tr(R"(Error copying remote "%s" to "%s": %s)"), source,
                                         destination, result.error().message()));
   }
 
@@ -311,11 +320,11 @@ ErrorMessageOr<void> ServiceDeployManager::CopyFileToLocalImpl(std::string_view 
 
   if (!sftp_channel_stop_result) {
     std::string sftp_error_message =
-        absl::StrFormat(R"(Error closing sftp channel (after copied remote "%s" to "%s": %s))",
+        absl::StrFormat(tr(R"(Error closing sftp channel (after copied remote "%s" to "%s": %s))"),
                         source, destination, sftp_channel_stop_result.error().message());
     ERROR("%s", sftp_error_message);
     return ErrorMessage(
-        absl::StrFormat("Download of file %s failed: %s", source, sftp_error_message));
+        absl::StrFormat(tr("Download of file %s failed: %s"), source, sftp_error_message));
   }
 
   return outcome::success();
@@ -323,7 +332,7 @@ ErrorMessageOr<void> ServiceDeployManager::CopyFileToLocalImpl(std::string_view 
 
 outcome::result<void> ServiceDeployManager::CopyOrbitServiceExecutable() {
   CHECK(QThread::currentThread() == thread());
-  emit statusMessage("Copying OrbitService executable to the remote instance...");
+  emit statusMessage(tr("Copying OrbitService executable to the remote instance..."));
 
   const std::string exe_destination_path = "/tmp/OrbitService";
   auto& config = std::get<BareExecutableAndRootPasswordDeployment>(*deployment_configuration_);
@@ -332,13 +341,13 @@ outcome::result<void> ServiceDeployManager::CopyOrbitServiceExecutable() {
       config.path_to_executable.string(), exe_destination_path,
       OrbitSshQt::SftpCopyToRemoteOperation::FileMode::kUserWritableAllExecutable));
 
-  emit statusMessage("Finished copying the OrbitService executable to the remote instance.");
+  emit statusMessage(tr("Finished copying the OrbitService executable to the remote instance."));
   return outcome::success();
 }
 
 outcome::result<void> ServiceDeployManager::StartOrbitService() {
   CHECK(QThread::currentThread() == thread());
-  emit statusMessage("Starting OrbitService on the remote instance...");
+  emit statusMessage(tr("Starting OrbitService on the remote instance..."));
 
   std::string task_string = "/opt/developer/tools/OrbitService";
   if (absl::GetFlag(FLAGS_devmode)) {
@@ -378,7 +387,7 @@ outcome::result<void> ServiceDeployManager::StartOrbitServicePrivileged() {
   // necessary to close stdin by sending EOF, since sudo would ask for trying to
   // enter the password again. Another option is to use std err as soon as its
   // implemented in OrbitSshQt::Task.
-  emit statusMessage("Starting OrbitService on the remote instance...");
+  emit statusMessage(tr("Starting OrbitService on the remote instance..."));
 
   std::string task_string = "sudo --stdin /tmp/OrbitService";
   if (absl::GetFlag(FLAGS_devmode)) {
@@ -413,7 +422,7 @@ outcome::result<void> ServiceDeployManager::StartOrbitServicePrivileged() {
 
 outcome::result<void> ServiceDeployManager::InstallOrbitServicePackage() {
   CHECK(QThread::currentThread() == thread());
-  emit statusMessage("Installing the OrbitService package on the remote instance...");
+  emit statusMessage(tr("Installing the OrbitService package on the remote instance..."));
 
   const auto command = absl::StrFormat(
       "sudo /usr/local/cloudcast/sbin/install_signed_package.sh %s", kDebDestinationPath);
@@ -444,7 +453,7 @@ outcome::result<void> ServiceDeployManager::InstallOrbitServicePackage() {
 
 outcome::result<void> ServiceDeployManager::ConnectToServer() {
   CHECK(QThread::currentThread() == thread());
-  emit statusMessage(QString("Connecting to %1:%2...")
+  emit statusMessage(tr("Connecting to %1:%2...")
                          .arg(QString::fromStdString(credentials_.addr_and_port.addr))
                          .arg(credentials_.addr_and_port.port));
 
@@ -461,7 +470,7 @@ outcome::result<void> ServiceDeployManager::ConnectToServer() {
 
   OUTCOME_TRY(MapError(loop.exec(), Error::kCouldNotConnectToServer));
 
-  emit statusMessage(QString("Successfully connected to %1:%2.")
+  emit statusMessage(tr("Successfully connected to %1:%2.")
                          .arg(QString::fromStdString(credentials_.addr_and_port.addr))
                          .arg(credentials_.addr_and_port.port));
 
@@ -527,13 +536,13 @@ outcome::result<ServiceDeployManager::GrpcPort> ServiceDeployManager::ExecImpl()
   } else if (std::holds_alternative<NoDeployment>(*deployment_configuration_)) {
     // Nothing to deploy
     emit statusMessage(
-        "Skipping deployment step. Expecting that OrbitService is already "
-        "running...");
+        tr("Skipping deployment step. Expecting that OrbitService is already "
+           "running..."));
   }
 
   OUTCOME_TRY(local_grpc_port, StartTunnel(&grpc_tunnel_, grpc_port_.grpc_port));
 
-  emit statusMessage("Successfully set up port forwarding!");
+  emit statusMessage(tr("Successfully set up port forwarding!"));
 
   LOG("Local port for gRPC is %d", local_grpc_port);
   return outcome::success(GrpcPort{local_grpc_port});

@@ -34,7 +34,7 @@ OrbitLiveFunctions::OrbitLiveFunctions(QWidget* parent)
       iterator_ui.second->SetCurrentTime(this->live_functions_.GetStartTime(index));
     }
   });
-  all_events_iterator_->SetFunctionName("All functions");
+  all_events_iterator_->SetFunctionName(tr("All functions").toStdString());
   all_events_iterator_->HideDeleteButton();
   all_events_iterator_->DisableButtons();
   dynamic_cast<QBoxLayout*>(ui->iteratorFrame->layout())

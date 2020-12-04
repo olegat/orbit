@@ -31,15 +31,20 @@ void SetupAllSteps(OrbitMainWindow* main_window) {
 }
 
 void SetupDynamicInstrumentationTutorial(QMenu* menu) {
-  auto action = menu->addAction("Dynamic Instrumentation");
+  auto action =
+      menu->addAction(QCoreApplication::translate("TutorialContent", "Dynamic Instrumentation"));
 
-  overlay->AddSection("dynamicInstrumentation", "Dynamic Instrumentation", {"capture", "analyze"});
+  overlay->AddSection(
+      "dynamicInstrumentation",
+      QCoreApplication::translate("TutorialContent", "Dynamic Instrumentation").toStdString(),
+      {"capture", "analyze"});
   QObject::connect(action, &QAction::triggered,
                    []() { overlay->StartSection("dynamicInstrumentation"); });
 }
 
 void InitTutorials(OrbitMainWindow* main_window) {
-  auto tutorials_menu = main_window->GetUi()->menuHelp->addMenu("Tutorials");
+  auto tutorials_menu = main_window->GetUi()->menuHelp->addMenu(
+      QCoreApplication::translate("TutorialContent", "Tutorials"));
 
   overlay = std::make_unique<TutorialOverlay>(main_window);
   static const int margin = 60;

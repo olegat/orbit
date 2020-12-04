@@ -323,7 +323,8 @@ int main(int argc, char* argv[]) {
     // The application display name is automatically appended to all window titles when shown in the
     // title bar: <specific window title> - <application display name>
     const auto version_string = QString::fromStdString(OrbitCore::GetVersion());
-    auto display_name = QString{"Orbit Profiler %1 [BETA]"}.arg(version_string);
+    auto display_name =
+        QCoreApplication::translate("Title Bar", "Orbit Profiler %1 [BETA]").arg(version_string);
 
     if (absl::GetFlag(FLAGS_devmode)) {
       display_name.append(" [DEVELOPER MODE]");
@@ -355,20 +356,23 @@ int main(int argc, char* argv[]) {
     const auto open_gl_version = OrbitQt::DetectOpenGlVersion();
 
     if (!open_gl_version) {
-      DisplayErrorToUser(
-          "OpenGL support was not found. Please make sure you're not trying to "
-          "start Orbit in a remote session and make sure you have a recent "
-          "graphics driver installed. Then try again!");
+      DisplayErrorToUser(QCoreApplication::translate(
+          "main",
+          "OpenGL support was not found. Please make sure you're not trying "
+          "to start Orbit in a remote session and make sure you have a "
+          "recent graphics driver installed. Then try again!"));
       return -1;
     }
 
     LOG("Detected OpenGL version: %i.%i", open_gl_version->major, open_gl_version->minor);
 
     if (open_gl_version->major < 2) {
-      DisplayErrorToUser(QString("The minimum required version of OpenGL is 2.0. But this machine "
-                                 "only supports up to version %1.%2. Please make sure you're not "
-                                 "trying to start Orbit in a remote session and make sure you "
-                                 "have a recent graphics driver installed. Then try again!")
+      DisplayErrorToUser(QCoreApplication::translate(
+                             "main",
+                             "The minimum required version of OpenGL is 2.0. But this machine only "
+                             "supports up to version %1.%2. Please make sure you're not trying to "
+                             "start Orbit in a remote session and make sure you have a recent "
+                             "graphics driver installed. Then try again!")
                              .arg(open_gl_version->major)
                              .arg(open_gl_version->minor));
       return -1;
@@ -376,8 +380,9 @@ int main(int argc, char* argv[]) {
 
     auto context = Context::Create();
     if (!context) {
-      DisplayErrorToUser(QString("An error occurred while initializing ssh: %1")
-                             .arg(QString::fromStdString(context.error().message())));
+      DisplayErrorToUser(
+          QCoreApplication::translate("main", "An error occurred while initializing ssh: %1")
+              .arg(QString::fromStdString(context.error().message())));
       return -1;
     }
 
@@ -392,8 +397,8 @@ int main(int argc, char* argv[]) {
         DisplayErrorToUser(QString::fromStdString(result.error().message()));
         return 1;
       } else if (result.error() != make_error_code(Error::kUserCanceledServiceDeployment)) {
-        DisplayErrorToUser(
-            QString("An error occurred: %1").arg(QString::fromStdString(result.error().message())));
+        DisplayErrorToUser(QCoreApplication::translate("main", "An error occurred: %1")
+                               .arg(QString::fromStdString(result.error().message())));
         break;
       }
     }
